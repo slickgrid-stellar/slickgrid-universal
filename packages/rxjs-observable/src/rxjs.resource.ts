@@ -1,6 +1,6 @@
 import { RxJsFacade } from '@slickgrid-universal/common';
 import { EMPTY, iif, isObservable, firstValueFrom, Observable, ObservableInput, of, OperatorFunction, ObservedValueOf, Subject, switchMap, } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 export class RxJsResource implements RxJsFacade {
   readonly className = 'RxJsResource';
@@ -23,7 +23,16 @@ export class RxJsResource implements RxJsFacade {
     return new Subject<T>();
   }
 
-  /** Converts an observable to a promise by subscribing to the observable, and returning a promise that will resolve
+  /**
+   * Returns a result {@link Observable} that emits all values pushed by the source observable if they
+   * are distinct in comparison to the last value the result observable emitted.
+   */
+  distinctUntilChanged<T>(comparator?: (previous: T, current: T) => boolean) {
+    return distinctUntilChanged(comparator);
+  }
+
+  /**
+   * Converts an observable to a promise by subscribing to the observable, and returning a promise that will resolve
    * as soon as the first value arrives from the observable. The subscription will then be closed.
    */
   firstValueFrom<T>(source: Observable<T>): Promise<T> {

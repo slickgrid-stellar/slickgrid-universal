@@ -362,17 +362,15 @@ export class Example15 {
       }
       const updatedData = filteredData.slice(firstRow, firstRow + top);
 
-      setTimeout(() => {
-        let countPropName = 'totalRecordCount';
-        if (this.isCountEnabled) {
-          countPropName = (this.odataVersion === 4) ? '@odata.count' : 'odata.count';
-        }
-        const backendResult = { items: updatedData, [countPropName]: countTotalItems, query };
-        // console.log('Backend Result', backendResult);
-        observer.next(backendResult);
-        observer.complete();
-      }, 150);
-    });
+      let countPropName = 'totalRecordCount';
+      if (this.isCountEnabled) {
+        countPropName = (this.odataVersion === 4) ? '@odata.count' : 'odata.count';
+      }
+      const backendResult = { items: updatedData, [countPropName]: countTotalItems, query };
+      // console.log('Backend Result', backendResult);
+      observer.next(backendResult);
+      observer.complete();
+    }).pipe(delay(150));
   }
 
   clearAllFiltersAndSorts() {

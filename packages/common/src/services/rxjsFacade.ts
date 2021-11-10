@@ -32,6 +32,14 @@ export abstract class RxJsFacade {
     throw new Error('RxJS Facade "createSubject" method must be implemented');
   }
 
+  /**
+   * Returns a result {@link Observable} that emits all values pushed by the source observable if they
+   * are distinct in comparison to the last value the result observable emitted.
+   */
+  distinctUntilChanged<T>(comparator?: (previous: T, current: T) => boolean) {
+    throw new Error('RxJS Facade "distinctUntilChanged" method must be implemented');
+  }
+
   /** Converts an observable to a promise by subscribing to the observable, and returning a promise that will resolve
    * as soon as the first value arrives from the observable. The subscription will then be closed.
    */
