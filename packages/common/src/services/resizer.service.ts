@@ -685,6 +685,9 @@ export class ResizerService {
         // visible grid (shown to the user and not hidden in another Tab will have an offsetParent defined)
         if (this.checkIsGridShown() && (isResizeRequired || containerElmOffset?.left === 0 || containerElmOffset?.top === 0)) {
           await this.resizeGrid();
+          if (resizeGoodCount < 5) {
+            this._grid.updateColumns(); // also refresh header titles after grid becomes visible in new tab, this fixes an issue observed in Salesforce
+          }
 
           // make sure the grid is still visible after doing the resize
           if (this.checkIsGridShown()) {

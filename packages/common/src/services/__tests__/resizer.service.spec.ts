@@ -54,6 +54,7 @@ const gridStub = {
   setPreHeaderPanelVisibility: jest.fn(),
   setOptions: jest.fn(),
   setSortColumns: jest.fn(),
+  updateColumns: jest.fn(),
   onColumnsResizeDblClick: new Slick.Event(),
   onSort: new Slick.Event(),
 } as unknown as SlickGrid;

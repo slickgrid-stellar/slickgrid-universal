@@ -110,7 +110,7 @@ export interface SlickGrid {
   getActiveViewportNode(event?: Event | SlickGridEventData): HTMLDivElement;
 
   /** Get the displayed scrollbar dimensions */
-  getDisplayedScrollbarDimensions(): { height: number; width: number; }
+  getDisplayedScrollbarDimensions(): { height: number; width: number; };
 
   /** Get the canvas DOM element */
   getCanvases(): HTMLDivElement;
@@ -477,6 +477,9 @@ export interface SlickGrid {
    * @param toolTip New column tooltip.
    */
   updateColumnHeader(columnId: string | number, title?: string, toolTip?: string): void;
+
+  /** Update columns for when a hidden property has changed but the column list itself has not changed. */
+  updateColumns(): void;
 
   /** Update paging information status from the View */
   updatePagingStatusFromView(pagingInfo: PagingInfo): void;
