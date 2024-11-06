@@ -7,7 +7,7 @@
 @use 'sass:color';
 
 // import external lib CSS files (without the .css extension)
-@use 'vanilla-calendar-pro/build/vanilla-calendar.min';
+@use 'vanilla-calendar-pro/styles/index';
 
 // SASS utils to generate SVGs
 @use './svg-utilities';

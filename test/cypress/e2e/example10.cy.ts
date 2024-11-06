@@ -407,28 +407,27 @@ describe('Example 10 - GraphQL Grid', () => {
     cy.get('.search-filter.filter-finish.filled input')
       .click({ force: true });
 
-    cy.get('.vanilla-calendar:visible');
+    cy.get('.vc:visible');
 
-    cy.get('.vanilla-calendar-column:nth(0) .vanilla-calendar-month')
+    cy.get('[data-vc="column"]:nth(0) [data-vc="month"]')
       .should('have.text', 'January');
 
-    cy.get('.vanilla-calendar-column:nth(1) .vanilla-calendar-month')
+    cy.get('[data-vc="column"]:nth(1) [data-vc="month"]')
       .should('have.text', 'February');
 
-    cy.get('.vanilla-calendar-year:nth(0)')
+    cy.get('[data-vc="year"]:nth(0)')
       .should('have.text', currentYear);
 
-    cy.get('.vanilla-calendar:visible')
-      .find('.vanilla-calendar-day__btn_selected')
+    cy.get('.vc:visible [data-vc-date-selected]')
       .should('have.length', 46);
 
-    cy.get('.vanilla-calendar:visible')
-      .find('.vanilla-calendar-day__btn_selected')
+    cy.get('.vc:visible')
+      .find('[data-vc-date-selected]')
       .first()
       .should('have.text', '1');
 
-    cy.get('.vanilla-calendar:visible')
-      .find('.vanilla-calendar-day__btn_selected')
+    cy.get('.vc:visible')
+      .find('[data-vc-date-selected]')
       .last()
       .should('have.text', '15');
   });
@@ -489,11 +488,11 @@ describe('Example 10 - GraphQL Grid', () => {
         .should('not.have.class', 'filled')
         .click();
 
-      cy.get('.vanilla-calendar-year:nth(0)')
+      cy.get('[data-vc="year"]:nth(0)')
         .should('have.text', currentYear);
 
-      cy.get('.vanilla-calendar:visible')
-        .find('.vanilla-calendar-day__btn_selected')
+      cy.get('.vc:visible')
+        .find('[data-vc-date-selected]')
         .should('not.exist');
     });
   });
@@ -938,8 +937,8 @@ describe('Example 10 - GraphQL Grid', () => {
       cy.get('.search-filter.filter-finish')
         .click();
 
-      cy.get('.vanilla-calendar:visible')
-        .find('.vanilla-calendar-day__btn_selected')
+      cy.get('.vc:visible')
+        .find('[data-vc-date-selected]')
         .should('not.exist');
 
       cy.get('h3').click();

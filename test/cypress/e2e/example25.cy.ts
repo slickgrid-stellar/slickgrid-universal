@@ -133,13 +133,13 @@ describe('Example 25 - Range Filters', () => {
     cy.get('.date-picker.search-filter.filter-finish')
       .click();
 
-    cy.get('.vanilla-calendar-day_selected-first')
+    cy.get('[data-vc-date-selected="first"]')
       .should('exist');
 
-    cy.get('.vanilla-calendar-day_selected-intermediate')
+    cy.get('[data-vc-date-selected="middle"]')
       .should('have.length.gte', 2);
 
-    cy.get('.vanilla-calendar-day_selected-last')
+    cy.get('[data-vc-date-selected="last"]')
       .should('exist');
   });
 

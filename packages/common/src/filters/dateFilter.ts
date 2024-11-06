@@ -1,8 +1,7 @@
 import { format, parse } from '@formkit/tempo';
 import { BindingEventService } from '@slickgrid-universal/binding';
 import { createDomElement, emptyElement, extend, isDefined, } from '@slickgrid-universal/utils';
-import VanillaCalendar from 'vanilla-calendar-pro';
-import type { IOptions } from 'vanilla-calendar-pro/types';
+import { type Options, type Range, VanillaCalendarPro } from 'vanilla-calendar-pro';
 
 import {
   FieldType,
@@ -34,7 +33,7 @@ export class DateFilter implements Filter {
   protected _currentDateStrings?: string[];
   protected _lastClickIsDate = false;
   protected _lastSearchValue?: string;
-  protected _pickerOptions!: IOptions;
+  protected _pickerOptions!: Options;
   protected _filterElm!: HTMLDivElement;
   protected _dateInputElm!: HTMLInputElement;
   protected _operator!: OperatorType | OperatorString;
@@ -42,7 +41,7 @@ export class DateFilter implements Filter {
   protected _shouldTriggerQuery = true;
   hasTimePicker = false;
   inputFilterType: 'compound' | 'range' = 'range';
-  calendarInstance?: VanillaCalendar;
+  calendarInstance?: VanillaCalendarPro;
   grid!: SlickGrid;
   searchTerms: SearchTerm[] = [];
   columnDef!: Column;
@@ -76,11 +75,11 @@ export class DateFilter implements Filter {
   }
 
   /** Getter for the date picker options */
-  get pickerOptions(): IOptions {
+  get pickerOptions(): Options {
     return this._pickerOptions || {};
   }
 
-  get filterOptions(): IOptions {
+  get filterOptions(): Options {
     return { ...this.gridOptions.defaultFilterOptions?.date, ...this.columnFilter?.filterOptions };
   }
 
@@ -169,9 +168,9 @@ export class DateFilter implements Filter {
           newVal: '',
           updatePickerUI: true,
           selectedSettings: {
-            dates: [],
-            month: now.getMonth(),
-            year: now.getFullYear()
+            selectedDates: [],
+            selectedMonth: now.getMonth() as Range<12>,
+            selectedYear: now.getFullYear()
           }
         });
       }
@@ -293,110 +292,93 @@ export class DateFilter implements Filter {
       }
     }
 
-    const pickerOptions: IOptions = {
-      input: true,
-      jumpToSelectedDate: true,
-      type: this.inputFilterType === 'range' ? 'multiple' : 'default',
-      sanitizer: (dirtyHtml) => this.grid.sanitizeHtmlString(dirtyHtml),
-      toggleSelected: false,
-      actions: {
-        clickDay: (_e) => {
-          this._lastClickIsDate = true;
-        },
-        changeToInput: (_e, self) => {
-          if (self.HTMLInputElement) {
-            let outDates: Array<Date | string> = [];
-            let firstDate = '';
-            let lastDate = ''; // when using date range
+    const pickerOptions: Options = {
+      isInput: true,
+      enableJumpToSelectedDate: true,
+      firstWeekday: 0,
+      enableDateToggle: true,
+      locale: currentLocale,
+      selectedTheme: this.gridOptions?.darkMode ? 'dark' : 'light',
+      positionToInput: 'auto',
+      sanitizerHTML: (dirtyHtml) => this.grid.sanitizeHtmlString(dirtyHtml),
+      selectedWeekends: [],
+      viewType: this.inputFilterType === 'range' ? 'multiple' : 'default',
+      onClickDate: () => {
+        this._lastClickIsDate = true;
+      },
+      onChangeToInput: (self) => {
+        if (self.private.inputElement) {
+          let outDates: Array<Date | string> = [];
+          let firstDate: string | number | Date = '';
+          let lastDate = ''; // when using date range
 
-            if (self.selectedDates[1]) {
-              self.selectedDates.sort((a, b) => +new Date(a) - +new Date(b));
-              firstDate = self.selectedDates[0];
-              lastDate = self.selectedDates[self.selectedDates.length - 1];
-              const firstDisplayDate = format(self.selectedDates[0], outputFormat, 'en-US');
-              const lastDisplayDate = format(lastDate, outputFormat, 'en-US');
-              self.HTMLInputElement.value = `${firstDisplayDate} — ${lastDisplayDate}`;
-              outDates = [firstDate, lastDate];
-            } else if (self.selectedDates[0]) {
-              firstDate = self.selectedDates[0];
-              self.HTMLInputElement.value = formatDateByFieldType(firstDate, FieldType.dateIso, outputFieldType);
-              outDates = self.selectedDates;
-            } else {
-              self.HTMLInputElement.value = '';
-            }
+          if (self.private.selectedDates[1]) {
+            self.private.selectedDates.sort((a, b) => +new Date(a) - +new Date(b));
+            firstDate = self.private.selectedDates[0];
+            lastDate = self.private.selectedDates[self.private.selectedDates.length - 1];
+            const firstDisplayDate = format(self.private.selectedDates[0], outputFormat, 'en-US');
+            const lastDisplayDate = format(lastDate, outputFormat, 'en-US');
+            self.private.inputElement.value = `${firstDisplayDate} — ${lastDisplayDate}`;
+            outDates = [firstDate, lastDate];
+          } else if (self.private.selectedDates[0]) {
+            firstDate = self.private.selectedDates[0];
+            self.private.inputElement.value = formatDateByFieldType(firstDate, FieldType.dateIso, outputFieldType);
+            outDates = self.private.selectedDates;
+          } else {
+            self.private.inputElement.value = '';
+          }
 
-            if (this.hasTimePicker && firstDate) {
-              const tempoDate = parse(firstDate, pickerFormat);
-              tempoDate.setHours(+(self.selectedHours || 0));
-              tempoDate.setMinutes(+(self.selectedMinutes || 0));
-              self.HTMLInputElement.value = formatDateByFieldType(tempoDate, undefined, outputFieldType);
-              outDates = [tempoDate];
-            }
+          if (this.hasTimePicker && firstDate) {
+            const tempoDate = parse(firstDate, pickerFormat);
+            tempoDate.setHours(+(self.private.selectedHours || 0));
+            tempoDate.setMinutes(+(self.private.selectedMinutes || 0));
+            self.private.inputElement.value = formatDateByFieldType(tempoDate, undefined, outputFieldType);
+            outDates = [tempoDate];
+          }
 
-            if (this.inputFilterType === 'compound') {
-              this._currentValue = formatDateByFieldType(outDates[0], undefined, columnFieldType);
-            } else {
-              if (Array.isArray(outDates)) {
-                this._currentDateStrings = outDates.map(date => formatDateByFieldType(date, undefined, columnFieldType));
-                this._currentValue = this._currentDateStrings.join('..');
-              }
-            }
-
-            this._currentDateOrDates = outDates.map(d => d instanceof Date ? d : parse(d, pickerFormat));
-
-            // when using the time picker, we can simulate a keyup event to avoid multiple backend request
-            // since backend request are only executed after user start typing, changing the time should be treated the same way
-            if (this._currentValue) {
-              const newEvent = this.hasTimePicker ? new Event('keyup') : undefined;
-              this.onTriggerEvent(newEvent);
-            }
-
-            // when using date range and we're not yet having 2 dates, then don't close picker just yet
-            if (this.inputFilterType === 'range' && self.selectedDates.length < 2) {
-              this._lastClickIsDate = false;
-            }
-            // if you want to hide the calendar after picking a date
-            if (this._lastClickIsDate) {
-              self.hide();
-              this._lastClickIsDate = false;
+          if (this.inputFilterType === 'compound') {
+            this._currentValue = formatDateByFieldType(outDates[0], undefined, columnFieldType);
+          } else {
+            if (Array.isArray(outDates)) {
+              this._currentDateStrings = outDates.map(date => formatDateByFieldType(date, undefined, columnFieldType));
+              this._currentValue = this._currentDateStrings.join('..');
             }
           }
+
+          this._currentDateOrDates = outDates.map(d => d instanceof Date ? d : parse(d, pickerFormat));
+
+          // when using the time picker, we can simulate a keyup event to avoid multiple backend request
+          // since backend request are only executed after user start typing, changing the time should be treated the same way
+          if (this._currentValue) {
+            const newEvent = this.hasTimePicker ? new Event('keyup') : undefined;
+            this.onTriggerEvent(newEvent);
+          }
+
+          // when using date range and we're not yet having 2 dates, then don't close picker just yet
+          if (this.inputFilterType === 'range' && self.private.selectedDates.length < 2) {
+            this._lastClickIsDate = false;
+          }
+          // if you want to hide the calendar after picking a date
+          if (this._lastClickIsDate) {
+            self.hide();
+            this._lastClickIsDate = false;
+          }
         }
-      },
-      settings: {
-        lang: currentLocale,
-        iso8601: false,
-        visibility: {
-          theme: this.gridOptions?.darkMode ? 'dark' : 'light',
-          positionToInput: 'auto',
-          weekend: false,
-        },
       },
     };
 
     if (this.inputFilterType === 'range') {
-      pickerOptions.type = 'multiple';
-      pickerOptions.months = 2;
-      pickerOptions.jumpMonths = 2;
-      pickerOptions.settings = {
-        ...pickerOptions.settings,
-        range: {
-          edgesOnly: true,
-        },
-        selection: {
-          day: 'multiple-ranged',
-        },
-        visibility: {
-          ...pickerOptions.settings?.visibility,
-          daysOutside: false,
-        },
-      };
+      pickerOptions.viewType = 'multiple';
+      pickerOptions.displayMonthsCount = 2;
+      pickerOptions.monthsToSwitch = 2;
+      pickerOptions.enableEdgeDatesOnly = true;
+      pickerOptions.selectionDatesMode = 'multiple-ranged';
+      pickerOptions.displayDatesOutside = false;
     }
 
     // add the time picker when format includes time (hours/minutes)
     if (this.hasTimePicker) {
-      pickerOptions.settings!.selection ??= {};
-      pickerOptions.settings!.selection.time = 24;
+      pickerOptions.selectionTimeMode = 24;
     }
 
     // merge options with optional user's custom options
@@ -414,11 +396,11 @@ export class DateFilter implements Filter {
       dataset: { input: '', columnid: `${columnId}` }
     });
 
-    this.calendarInstance = new VanillaCalendar(this._dateInputElm, this._pickerOptions);
+    this.calendarInstance = new VanillaCalendarPro(this._dateInputElm, this._pickerOptions);
     this.calendarInstance.init();
 
-    if (this._pickerOptions.settings?.selected?.dates) {
-      pickerValues = this._pickerOptions.settings.selected.dates;
+    if (this._pickerOptions?.selectedDates) {
+      pickerValues = this._pickerOptions.selectedDates;
     }
 
     if (pickerValues) {
