@@ -467,7 +467,7 @@ export class GridExample {
     if (columnDef.id === 'completed') {
       this.compositeEditorInstance.changeFormEditorOption('percentComplete', 'filter', formValues.completed);
       this.compositeEditorInstance.changeFormEditorOption('product', 'minLength', 3);
-      this.compositeEditorInstance.changeFormEditorOption('finish', 'range', { min: 'today' });
+      this.compositeEditorInstance.changeFormEditorOption('finish', 'displayDateMin', 'today');
     }
   }
 }
@@ -499,7 +499,7 @@ export class GridExample {
     if (columnDef.id === 'completed') {
       this.compositeEditorInstance.changeFormEditorOption('percentComplete', 'filter', true);   // multiple-select.js, show filter in dropdown
       this.compositeEditorInstance.changeFormEditorOption('product', 'minLength', 3);           // autocomplete, change minLength char to type
-      this.compositeEditorInstance.changeFormEditorOption('finish', 'range', { min: 'today' }); // vanilla calendar date picker, change minDate to today
+      this.compositeEditorInstance.changeFormEditorOption('finish', 'displayDateMin', 'today'); // vanilla calendar date picker, change minDate to today
     }
   }
 }

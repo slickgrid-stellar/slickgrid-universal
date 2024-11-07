@@ -28,10 +28,8 @@ prepareGrid() {
       editor: {
         model: Editors.date,
         editorOptions: {
-          range: {
-            max: 'today',
-            disabled: ['2022-08-15', '2022-08-20'],
-          }
+          displayDateMax: 'today',
+          disableDates: ['2022-08-15', '2022-08-20'],
         } as VanillaCalendarOption,
       },
     },
@@ -50,7 +48,7 @@ You could also define certain options as a global level (for the entire grid or 
 ```ts
 this.gridOptions = {
   defaultEditorOptions: {
-    date: { range: { min: 'today' } }, // typed as VanillaCalendarOption
+    date: { displayDateMin: 'today' }, // typed as VanillaCalendarOption
   }
 }
 ```

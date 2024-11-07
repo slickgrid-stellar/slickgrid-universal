@@ -141,7 +141,7 @@ export default class Example03 {
         sortable: true,
         editor: {
           model: Editors.date,
-          editorOptions: { range: { min: 'today' } } as VanillaCalendarOption
+          editorOptions: { displayDateMin: 'today' } as VanillaCalendarOption
         },
         // formatter: Formatters.dateIso,
         type: FieldType.date, outputType: FieldType.dateIso,

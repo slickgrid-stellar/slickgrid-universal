@@ -1,7 +1,7 @@
 import { format, parse } from '@formkit/tempo';
 import { BindingEventService } from '@slickgrid-universal/binding';
 import { createDomElement, emptyElement, extend, isDefined, } from '@slickgrid-universal/utils';
-import { type Options, type Range, VanillaCalendarPro } from 'vanilla-calendar-pro';
+import { Calendar, type Options } from 'vanilla-calendar-pro';
 
 import {
   FieldType,
@@ -23,7 +23,7 @@ import { formatDateByFieldType, mapTempoDateFormatWithFieldType } from '../servi
 import { mapOperatorToShorthandDesignation } from '../services/utilities.js';
 import type { TranslaterService } from '../services/translater.service.js';
 import type { SlickGrid } from '../core/slickGrid.js';
-import { setPickerDates } from '../commonEditorFilter/commonEditorFilterUtils.js';
+import { resetDatePicker, setPickerDates } from '../commonEditorFilter/commonEditorFilterUtils.js';
 
 export class DateFilter implements Filter {
   protected _bindEventService: BindingEventService;
@@ -41,7 +41,7 @@ export class DateFilter implements Filter {
   protected _shouldTriggerQuery = true;
   hasTimePicker = false;
   inputFilterType: 'compound' | 'range' = 'range';
-  calendarInstance?: VanillaCalendarPro;
+  calendarInstance?: Calendar;
   grid!: SlickGrid;
   searchTerms: SearchTerm[] = [];
   columnDef!: Column;
@@ -161,18 +161,7 @@ export class DateFilter implements Filter {
       }
 
       if (this.calendarInstance) {
-        const now = new Date();
-        setPickerDates(this.columnFilter, this._dateInputElm, this.calendarInstance, {
-          columnDef: this.columnDef,
-          oldVal: this._currentDateOrDates,
-          newVal: '',
-          updatePickerUI: true,
-          selectedSettings: {
-            selectedDates: [],
-            selectedMonth: now.getMonth() as Range<12>,
-            selectedYear: now.getFullYear()
-          }
-        });
+        resetDatePicker(this.calendarInstance);
       }
     }
     this.onTriggerEvent(new Event('keyup'));
@@ -228,7 +217,6 @@ export class DateFilter implements Filter {
       setPickerDates(this.columnFilter, this._dateInputElm, this.calendarInstance, {
         columnDef: this.columnDef,
         newVal: pickerValues,
-        updatePickerUI: true
       });
       this._currentDateOrDates = (values && pickerValues) ? pickerValues : undefined;
     }
@@ -293,7 +281,7 @@ export class DateFilter implements Filter {
     }
 
     const pickerOptions: Options = {
-      isInput: true,
+      inputMode: true,
       enableJumpToSelectedDate: true,
       firstWeekday: 0,
       enableDateToggle: true,
@@ -302,37 +290,37 @@ export class DateFilter implements Filter {
       positionToInput: 'auto',
       sanitizerHTML: (dirtyHtml) => this.grid.sanitizeHtmlString(dirtyHtml),
       selectedWeekends: [],
-      viewType: this.inputFilterType === 'range' ? 'multiple' : 'default',
+      type: this.inputFilterType === 'range' ? 'multiple' : 'default',
       onClickDate: () => {
         this._lastClickIsDate = true;
       },
       onChangeToInput: (self) => {
-        if (self.private.inputElement) {
+        if (self.context.inputElement) {
           let outDates: Array<Date | string> = [];
           let firstDate: string | number | Date = '';
           let lastDate = ''; // when using date range
 
-          if (self.private.selectedDates[1]) {
-            self.private.selectedDates.sort((a, b) => +new Date(a) - +new Date(b));
-            firstDate = self.private.selectedDates[0];
-            lastDate = self.private.selectedDates[self.private.selectedDates.length - 1];
-            const firstDisplayDate = format(self.private.selectedDates[0], outputFormat, 'en-US');
+          if (self.context.selectedDates[1]) {
+            self.context.selectedDates.sort((a, b) => +new Date(a) - +new Date(b));
+            firstDate = self.context.selectedDates[0];
+            lastDate = self.context.selectedDates[self.context.selectedDates.length - 1];
+            const firstDisplayDate = format(self.context.selectedDates[0], outputFormat, 'en-US');
             const lastDisplayDate = format(lastDate, outputFormat, 'en-US');
-            self.private.inputElement.value = `${firstDisplayDate} — ${lastDisplayDate}`;
+            self.context.inputElement.value = `${firstDisplayDate} — ${lastDisplayDate}`;
             outDates = [firstDate, lastDate];
-          } else if (self.private.selectedDates[0]) {
-            firstDate = self.private.selectedDates[0];
-            self.private.inputElement.value = formatDateByFieldType(firstDate, FieldType.dateIso, outputFieldType);
-            outDates = self.private.selectedDates;
+          } else if (self.context.selectedDates[0]) {
+            firstDate = self.context.selectedDates[0];
+            self.context.inputElement.value = formatDateByFieldType(firstDate, FieldType.dateIso, outputFieldType);
+            outDates = self.context.selectedDates;
           } else {
-            self.private.inputElement.value = '';
+            self.context.inputElement.value = '';
           }
 
           if (this.hasTimePicker && firstDate) {
             const tempoDate = parse(firstDate, pickerFormat);
-            tempoDate.setHours(+(self.private.selectedHours || 0));
-            tempoDate.setMinutes(+(self.private.selectedMinutes || 0));
-            self.private.inputElement.value = formatDateByFieldType(tempoDate, undefined, outputFieldType);
+            tempoDate.setHours(+(self.context.selectedHours || 0));
+            tempoDate.setMinutes(+(self.context.selectedMinutes || 0));
+            self.context.inputElement.value = formatDateByFieldType(tempoDate, undefined, outputFieldType);
             outDates = [tempoDate];
           }
 
@@ -355,7 +343,7 @@ export class DateFilter implements Filter {
           }
 
           // when using date range and we're not yet having 2 dates, then don't close picker just yet
-          if (this.inputFilterType === 'range' && self.private.selectedDates.length < 2) {
+          if (this.inputFilterType === 'range' && self.context.selectedDates.length < 2) {
             this._lastClickIsDate = false;
           }
           // if you want to hide the calendar after picking a date
@@ -368,7 +356,7 @@ export class DateFilter implements Filter {
     };
 
     if (this.inputFilterType === 'range') {
-      pickerOptions.viewType = 'multiple';
+      pickerOptions.type = 'multiple';
       pickerOptions.displayMonthsCount = 2;
       pickerOptions.monthsToSwitch = 2;
       pickerOptions.enableEdgeDatesOnly = true;
@@ -382,7 +370,7 @@ export class DateFilter implements Filter {
     }
 
     // merge options with optional user's custom options
-    this._pickerOptions = extend(true, {}, pickerOptions, { settings: this.filterOptions });
+    this._pickerOptions = extend(true, {}, pickerOptions, this.filterOptions);
 
     let placeholder = this.gridOptions?.defaultFilterPlaceholder ?? '';
     if (this.columnFilter?.placeholder) {
@@ -396,7 +384,7 @@ export class DateFilter implements Filter {
       dataset: { input: '', columnid: `${columnId}` }
     });
 
-    this.calendarInstance = new VanillaCalendarPro(this._dateInputElm, this._pickerOptions);
+    this.calendarInstance = new Calendar(this._dateInputElm, this._pickerOptions);
     this.calendarInstance.init();
 
     if (this._pickerOptions?.selectedDates) {

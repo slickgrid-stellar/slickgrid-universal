@@ -1,6 +1,6 @@
 import { format } from '@formkit/tempo';
 import type { AutocompleteItem } from 'autocompleter';
-import { type FormatDateString, type Options, type Range, VanillaCalendarPro } from 'vanilla-calendar-pro';
+import { Calendar, type FormatDateString, type Options, type Range } from 'vanilla-calendar-pro';
 
 import { FieldType } from '../enums/fieldType.enum.js';
 import type { AutocompleterOption, Column, ColumnEditor, ColumnFilter } from '../interfaces/index.js';
@@ -33,10 +33,22 @@ export function addAutocompleteLoadingByOverridingFetch<T extends AutocompleteIt
   }
 }
 
+export function resetDatePicker(pickerInstance: Calendar): void {
+  const today = new Date();
+  pickerInstance.selectedDates = [];
+  pickerInstance.selectedMonth = today.getMonth() as Range<12>;
+  pickerInstance.selectedYear = today.getFullYear();
+  const dateInputElm = pickerInstance.context.inputElement;
+  if (dateInputElm) {
+    dateInputElm.value = '';
+  }
+  pickerInstance.update();
+}
+
 export function setPickerDates(
   colEditorOrFilter: ColumnEditor | ColumnFilter,
   dateInputElm: HTMLInputElement,
-  pickerInstance: Options | VanillaCalendarPro,
+  pickerInstance: Options | Calendar,
   options: {
     oldVal?: Date | string | Array<Date | string> | undefined,
     newVal: Date | string | Array<Date | string> | undefined,
@@ -68,12 +80,12 @@ export function setPickerDates(
       selectedTime: inputFormat === 'ISO8601' || (inputFormat || '').toLowerCase().includes('h') ? format(pickerDates[0], 'HH:mm') : undefined,
     };
 
-    if (updatePickerUI && hasCalendarChanges(pickerInstance, newSettingSelected) && pickerInstance instanceof VanillaCalendarPro) {
+    if (updatePickerUI !== false && hasCalendarChanges(pickerInstance, newSettingSelected) && pickerInstance instanceof Calendar) {
       pickerInstance.selectedDates = newSettingSelected.selectedDates!;
       pickerInstance.selectedMonth = newSettingSelected.selectedMonth!;
       pickerInstance.selectedYear = newSettingSelected.selectedYear!;
       pickerInstance.selectedTime = newSettingSelected.selectedTime!;
-      pickerInstance.update({ dates: true, month: true, year: true, time: true });
+      pickerInstance.update();
     }
 
     dateInputElm.value = newDates.length ? pickerDates.map(p => formatDateByFieldType(p, undefined, outputFieldType)).join(' — ') : '';

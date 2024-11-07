@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { VanillaCalendarPro } from 'vanilla-calendar-pro';
+import type { Calendar } from 'vanilla-calendar-pro';
 
 import { FieldType } from '../../enums/index.js';
 import type { Column, FilterArguments, GridOption } from '../../interfaces/index.js';
@@ -116,7 +116,7 @@ describe('DateRangeFilter', () => {
       enableEdgeDatesOnly: true,
       enableJumpToSelectedDate: true,
       firstWeekday: 0,
-      isInput: true,
+      inputMode: true,
       locale: 'en',
       monthsToSwitch: 2,
       onChangeToInput: expect.any(Function),
@@ -126,8 +126,7 @@ describe('DateRangeFilter', () => {
       selectionDatesMode: 'multiple-ranged',
       selectedTheme: 'light',
       selectedWeekends: [],
-      viewType: 'multiple',
-      settings: {},
+      type: 'multiple',
     });
   });
 
@@ -152,8 +151,8 @@ describe('DateRangeFilter', () => {
 
     filter.init(filterArguments);
     const filterInputElm = divContainer.querySelector('div.date-picker.search-filter.filter-finish input.date-picker') as HTMLInputElement;
-    filter.calendarInstance!.onChangeToInput!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
-    filter.calendarInstance!.onClickDate!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
+    filter.calendarInstance!.onChangeToInput!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
+    filter.calendarInstance!.onClickDate!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
     const filterFilledElms = divContainer.querySelectorAll<HTMLInputElement>('.date-picker.search-filter.filter-finish.filled');
 
     expect(filterFilledElms.length).toBe(1);
@@ -167,8 +166,8 @@ describe('DateRangeFilter', () => {
     filter.init(filterArguments);
     const filterInputElm = divContainer.querySelector('.search-filter.filter-finish input.date-picker') as HTMLInputElement;
     filterInputElm.value = '2001-01-02T16:02:02.239Z';
-    filter.calendarInstance!.onClickDate!({ private: { inputElement: filterInputElm, selectedDates: [] }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
-    filter.calendarInstance!.onChangeToInput!({ private: { inputElement: filterInputElm, selectedDates: [] }, hide: vi.fn() } as unknown as VanillaCalendarPro, new Event('click'));
+    filter.calendarInstance!.onClickDate!({ context: { inputElement: filterInputElm, selectedDates: [] }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
+    filter.calendarInstance!.onChangeToInput!({ context: { inputElement: filterInputElm, selectedDates: [] }, hide: vi.fn() } as unknown as Calendar, new Event('click'));
     const filterFilledElms = divContainer.querySelectorAll<HTMLInputElement>('.form-group.search-filter.filter-finish.filled');
 
     expect(filterFilledElms.length).toBe(0);
@@ -182,8 +181,8 @@ describe('DateRangeFilter', () => {
 
     filter.init(filterArguments);
     const filterInputElm = divContainer.querySelector('.date-picker.search-filter.filter-finish input.date-picker') as HTMLInputElement;
-    filter.calendarInstance!.onChangeToInput!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
-    filter.calendarInstance!.onClickDate!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
+    filter.calendarInstance!.onChangeToInput!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
+    filter.calendarInstance!.onClickDate!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
     const filterFilledElms = divContainer.querySelectorAll<HTMLInputElement>('.date-picker.search-filter.filter-finish.filled');
 
     expect(filterFilledElms.length).toBe(1);
@@ -221,8 +220,8 @@ describe('DateRangeFilter', () => {
     const filterInputElm = divContainer.querySelector('.date-picker.search-filter.filter-finish input.date-picker') as HTMLInputElement;
 
     filterInputElm.focus();
-    filter.calendarInstance!.onChangeToInput!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
-    filter.calendarInstance!.onClickDate!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
+    filter.calendarInstance!.onChangeToInput!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
+    filter.calendarInstance!.onClickDate!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
     const filterFilledElms = divContainer.querySelectorAll<HTMLInputElement>('.date-picker.search-filter.filter-finish.filled');
 
     expect(filterFilledElms.length).toBe(1);
@@ -240,8 +239,8 @@ describe('DateRangeFilter', () => {
     const filterInputElm = divContainer.querySelector('.date-picker.search-filter.filter-finish input.date-picker') as HTMLInputElement;
 
     filterInputElm.focus();
-    filter.calendarInstance!.onClickDate!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
-    filter.calendarInstance!.onChangeToInput!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
+    filter.calendarInstance!.onClickDate!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
+    filter.calendarInstance!.onChangeToInput!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
 
     const filterFilledElms = divContainer.querySelectorAll<HTMLInputElement>('.date-picker.search-filter.filter-finish.filled');
 
@@ -280,8 +279,8 @@ describe('DateRangeFilter', () => {
     filter.show();
 
     filterInputElm.focus();
-    filter.calendarInstance!.onClickDate!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
-    filter.calendarInstance!.onChangeToInput!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
+    filter.calendarInstance!.onClickDate!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
+    filter.calendarInstance!.onChangeToInput!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
     const filterFilledElms = divContainer.querySelectorAll<HTMLInputElement>('.date-picker.search-filter.filter-finish.filled');
 
     expect(filterFilledElms.length).toBe(1);
@@ -329,8 +328,8 @@ describe('DateRangeFilter', () => {
     filter.init(filterArguments);
     const filterInputElm = divContainer.querySelector('.date-picker.search-filter.filter-finish input.date-picker') as HTMLInputElement;
     filterInputElm.value = '2001-01-02 — 2001-01-13';
-    filter.calendarInstance!.onChangeToInput!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
-    filter.calendarInstance!.onClickDate!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
+    filter.calendarInstance!.onChangeToInput!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
+    filter.calendarInstance!.onClickDate!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
 
     const filterFilledElms = divContainer.querySelectorAll<HTMLInputElement>('.date-picker.search-filter.filter-finish.filled');
 
@@ -353,8 +352,8 @@ describe('DateRangeFilter', () => {
     filter.init(filterArguments);
     const filterInputElm = divContainer.querySelector('div.date-picker.search-filter.filter-finish input.date-picker') as HTMLInputElement;
     filterInputElm.value = '2001-01-02 — 2001-01-13';
-    filter.calendarInstance!.onChangeToInput!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
-    filter.calendarInstance!.onClickDate!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
+    filter.calendarInstance!.onChangeToInput!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
+    filter.calendarInstance!.onClickDate!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
     const filterFilledElms = divContainer.querySelectorAll<HTMLInputElement>('.date-picker.search-filter.filter-finish.filled');
 
     expect(filterFilledElms.length).toBe(1);
@@ -377,8 +376,8 @@ describe('DateRangeFilter', () => {
 
     filterInputElm.focus();
     filterInputElm.value = '2001-01-02 — 2001-01-13';
-    filter.calendarInstance!.onChangeToInput!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
-    filter.calendarInstance!.onClickDate!({ private: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as VanillaCalendarPro, new MouseEvent('click'));
+    filter.calendarInstance!.onChangeToInput!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
+    filter.calendarInstance!.onClickDate!({ context: { inputElement: filterInputElm, selectedDates }, hide: vi.fn() } as unknown as Calendar, new MouseEvent('click'));
     const filterFilledElms = divContainer.querySelectorAll<HTMLInputElement>('.date-picker.search-filter.filter-finish.filled');
 
     expect(filterFilledElms.length).toBe(1);

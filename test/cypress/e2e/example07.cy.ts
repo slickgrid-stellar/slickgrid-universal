@@ -171,7 +171,7 @@ describe('Example 07 - Row Move & Checkbox Selector Selector Plugins', () => {
 
     // change Finish date
     cy.get(`[style="top: ${GRID_ROW_HEIGHT * 2}px;"] > .slick-cell:nth(7)`).should('contain', '2009-01-05').click();
-    cy.get('.vc:visible [data-vc-date-btn]:contains("22"):visible').first().click();
+    cy.get('.vc:visible [data-vc-date-btn]:visible').contains(/22$/).click();
     cy.get(`[style="top: ${GRID_ROW_HEIGHT * 2}px;"] > .slick-cell:nth(7)`).should('contain', '2009-01-22');
 
     cy.get('.slick-viewport.slick-viewport-top.slick-viewport-left')
@@ -289,7 +289,7 @@ describe('Example 07 - Row Move & Checkbox Selector Selector Plugins', () => {
 
     // change Finish date
     cy.get(`[style="top: ${GRID_ROW_HEIGHT * 0}px;"] > .slick-cell:nth(7)`).should('contain', '2009-01-05').click();
-    cy.get('.vc:visible [data-vc-date-btn]:contains("22"):visible').first().click();
+    cy.get('.vc:visible [data-vc-date-btn]:visible').contains(/22$/).click();
     cy.get(`[style="top: ${GRID_ROW_HEIGHT * 0}px;"] > .slick-cell:nth(7)`).should('contain', '2009-01-22');
 
     cy.get(`[style="top: ${GRID_ROW_HEIGHT * 0}px;"] > .slick-cell:nth(10)`).should('contain', 'Task 0000');

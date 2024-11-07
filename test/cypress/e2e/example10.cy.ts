@@ -418,7 +418,7 @@ describe('Example 10 - GraphQL Grid', () => {
     cy.get('[data-vc="year"]:nth(0)')
       .should('have.text', currentYear);
 
-    cy.get('.vc:visible [data-vc-date-selected]')
+    cy.get('.vc:visible [data-vc-date-selected] button')
       .should('have.length', 46);
 
     cy.get('.vc:visible')
