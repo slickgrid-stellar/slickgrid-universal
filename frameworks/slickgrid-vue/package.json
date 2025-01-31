@@ -80,7 +80,7 @@
     "i18next": "^24.2.2",
     "i18next-vue": "^5.0.0",
     "sass": "catalog:",
-    "semver": "^7.6.3",
+    "semver": "^7.7.0",
     "strong-log-transformer": "^2.1.0",
     "tinyexec": "^0.3.2",
     "tinyrainbow": "^2.0.0",
